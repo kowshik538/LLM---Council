@@ -21,6 +21,10 @@ async def query_model(
     Returns:
         Response dict with 'content' and optional 'reasoning_details', or None if failed
     """
+    if not OPENROUTER_API_KEY:
+        print("Error querying model: OPENROUTER_API_KEY is missing.")
+        return None
+
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
