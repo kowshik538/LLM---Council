@@ -15,16 +15,21 @@ from .council import run_full_council, generate_conversation_title, stage1_colle
 
 app = FastAPI(title="LLM Council API")
 
-# Configure CORS for local development and deployed frontend
+# Configure CORS for local development and deployed frontend.
+# Normalize trailing slashes so env values like https://site.onrender.com/
+# still match browser Origin headers (which never include trailing slash).
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
-allowed_origins = [
+default_origins = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
-if allowed_origins_env.strip():
-    allowed_origins.extend(
-        [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
-    )
+env_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+allowed_origins = list(
+    {
+        origin.rstrip("/")
+        for origin in [*default_origins, *env_origins]
+    }
+)
 
 app.add_middleware(
     CORSMiddleware,
