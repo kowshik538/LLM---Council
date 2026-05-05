@@ -7,8 +7,16 @@ from dotenv import load_dotenv
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(PROJECT_ROOT / ".env")
 
-# OpenRouter API key (set in .env)
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+# OpenRouter API key (set in .env / deployment environment).
+# Normalize common env formatting mistakes (quotes/newlines/spaces).
+_raw_openrouter_key = (os.getenv("OPENROUTER_API_KEY") or "").strip()
+if (
+    len(_raw_openrouter_key) >= 2
+    and _raw_openrouter_key[0] == _raw_openrouter_key[-1]
+    and _raw_openrouter_key[0] in {"'", '"'}
+):
+    _raw_openrouter_key = _raw_openrouter_key[1:-1].strip()
+OPENROUTER_API_KEY = _raw_openrouter_key or None
 
 # Council members - valid OpenRouter model identifiers
 COUNCIL_MODELS = [
